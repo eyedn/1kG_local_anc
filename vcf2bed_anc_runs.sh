@@ -13,7 +13,7 @@
 
 #SBATCH --array=1-22
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=80G
+#SBATCH --mem=4G
 #SBATCH --time=00:30:00
 #SBATCH --partition=qcbr
 #SBATCH --account=jazlynmo_738
