@@ -7,12 +7,10 @@
 #           Department of Quantitative and Computational Biology 
 #           Mooney Lab
 #           ---
-#           submit_vcf2anc_table.sh
+#           submit_vcf2bed_anc_runs.sh
 ###############################################################################
-
 
 pops="/project/jazlynmo_738/aydin/pops_in_LocalAncestryFlare.txt"
 for pop in $(cat "$pops"); do
-    echo "submitting vcf2anc_table.sh on ${pop}"
-    sbatch  --job-name=${pop}anc vcf2anc_table.sh "$pop"
+    sbatch --job-name=${pop}anc vcf2bed_anc_runs.sh "$pop"
 done
