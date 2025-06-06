@@ -10,7 +10,6 @@
 #           vcf2anc_table.sh
 ###############################################################################
 
-
 #SBATCH --array=1-22
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
@@ -23,7 +22,6 @@
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=karatas@usc.edu
 
-
 # setup environment
 source ~/.bashrc
 module purge
@@ -34,24 +32,27 @@ SCRATCH="/scratch1/karatas"
 LocalAncestryFLARE="/project/jazlynmo_738/DataRepository/Human/1000GenomeNYGC_hg38/LocalAncestryFLARE"
 pop="$1"
 chr="$SLURM_ARRAY_TASK_ID"
+
 vcf="${LocalAncestryFLARE}/${pop}_local_ancestry_chr${chr}.anc.vcf.gz"
 mkdir -p "$SCRATCH/LocalAncestryFLARE_anc_tables"
 anc_table="${SCRATCH}/LocalAncestryFLARE_anc_tables/${pop}_chr${chr}_anc_pos.tsv.gz"
-anc_runs="${SCRATCH}/LocalAncestryFLARE_anc_tables/${pop}_chr${chr}_anc_runs.bed"
+anc_runs="${SCRATCH}/LocalAncestryFLARE_anc_tables/${pop}_chr${chr}_anc_runs.bed.gz"
 
 # build ancestry table of each position from vcf
 date
-echo "vcf2bed_anc_runs: creating table for $pop on  chr$chr"
+echo "vcf2bed_anc_runs: creating table for $pop on chr$chr"
 
 samples=( $(bcftools query -l "$vcf") )
 header="POS"
 for s in "${samples[@]}"; do
     header+="\t${s}_AN1\t${s}_AN2"
 done
-(echo -e "$header"; bcftools query -f '%POS[\t%AN1\t%AN2]\n' "$vcf") \
-    | gzip > "$anc_table"
+(
+    echo -e "$header"
+    bcftools query -f '%POS[\t%AN1\t%AN2]\n' "$vcf"
+) | gzip > "$anc_table"
 
 # convert ancestry table to bed
 date
-echo "vcf2bed_anc_runs: generate bed of ancentral runs for $pop on  chr$chr"
+echo "vcf2bed_anc_runs: generating bed of ancestral runs for $pop on chr$chr"
 Rscript anc_table2bed.R "$anc_table" "$anc_runs"

@@ -7,10 +7,9 @@
 #           Department of Quantitative and Computational Biology 
 #           Mooney Lab
 #           ---
-#           submit_vcf2bed_anc_runs.sh
+#           submit_anc_runs_in_ibd.sh
 ###############################################################################
 
 pops="pops_in_LocalAncestryFlare.txt"
-for pop in $(cat "$pops"); do
-    sbatch --job-name="${pop}anc" vcf2bed_anc_runs.sh "$pop"
-done
+total_pops=$(wc -l < "$pops")
+sbatch --array=1-${total_pops} anc_runs_in_ibd.sh
