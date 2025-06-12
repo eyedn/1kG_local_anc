@@ -7,7 +7,7 @@
 #           Department of Quantitative and Computational Biology 
 #           Mooney Lab
 #           ---
-#           vcf2anc_table.sh
+#           vcf2bed_anc_runs.sh
 ###############################################################################
 
 #SBATCH --array=1-22
@@ -28,31 +28,29 @@ module purge
 module load gcc/13.3.0 bcftools/1.19 r/4.5.0
 
 # define paths/vars
-SCRATCH="/scratch1/karatas"
-LocalAncestryFLARE="/project/jazlynmo_738/DataRepository/Human/1000GenomeNYGC_hg38/LocalAncestryFLARE"
-pop="$1"
-chr="$SLURM_ARRAY_TASK_ID"
+LOCAL_ANC="${JM1KG}/LocalAncestryFLARE"
+POP="$1"
+CHR="$SLURM_ARRAY_TASK_ID"
 
-vcf="${LocalAncestryFLARE}/${pop}_local_ancestry_chr${chr}.anc.vcf.gz"
+VCF="${LOCAL_ANC}/${POP}_local_ancestry_chr${CHR}.anc.vcf.gz"
 mkdir -p "$SCRATCH/LocalAncestryFLARE_anc_tables"
-anc_table="${SCRATCH}/LocalAncestryFLARE_anc_tables/${pop}_chr${chr}_anc_pos.tsv.gz"
-anc_runs="${SCRATCH}/LocalAncestryFLARE_anc_tables/${pop}_chr${chr}_anc_runs.bed.gz"
+ANC_POS="${SCRATCH}/LocalAncestryFLARE_anc_tables/${POP}_chr${CHR}_anc_pos.tsv.gz"
+ANC_RUNS="${SCRATCH}/LocalAncestryFLARE_anc_tables/${POP}_chr${CHR}_anc_runs.bed.gz"
 
 # build ancestry table of each position from vcf
 date
-echo "vcf2bed_anc_runs: creating table for $pop on chr$chr"
+echo "vcf2bed_anc_runs: creating table for $POP on chr$CHR"
 
-samples=( $(bcftools query -l "$vcf") )
+samples=( $(bcftools query -l "$VCF") )
 header="POS"
 for s in "${samples[@]}"; do
     header+="\t${s}_AN1\t${s}_AN2"
 done
-(
-    echo -e "$header"
-    bcftools query -f '%POS[\t%AN1\t%AN2]\n' "$vcf"
-) | gzip > "$anc_table"
+(echo -e "$header"; bcftools query -f '%POS[\t%AN1\t%AN2]\n' "$VCF") \
+    | gzip > "$ANC_POS"
 
 # convert ancestry table to bed
 date
-echo "vcf2bed_anc_runs: generating bed of ancestral runs for $pop on chr$chr"
-Rscript anc_table2bed.R "$anc_table" "$anc_runs"
+echo "vcf2bed_anc_runs: generating bed of ancestral runs for $POP on chr$CHR"
+Rscript "${JMPROJ2ME}/1kG_local_anc/job_scripts_anc_table2bed.R" \
+    "$ANC_POS" "$ANC_RUNS"

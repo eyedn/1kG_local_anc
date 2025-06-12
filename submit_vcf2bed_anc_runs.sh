@@ -10,7 +10,7 @@
 #           submit_vcf2bed_anc_runs.sh
 ###############################################################################
 
-pops="pops_in_LocalAncestryFlare.txt"
-for pop in $(cat "$pops"); do
-    sbatch --job-name="${pop}anc" vcf2bed_anc_runs.sh "$pop"
+POPS="pops_in_LocalAncestryFlare.txt"
+for pop in $(cat "$POPS"); do
+    sbatch --job-name="${pop}anc" job_scripts/vcf2bed_anc_runs.sh "$pop"
 done

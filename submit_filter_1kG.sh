@@ -7,9 +7,7 @@
 #           Department of Quantitative and Computational Biology 
 #           Mooney Lab
 #           ---
-#           submit_anc_runs_in_ibd.sh
+#           submit_filter_1kG.sh
 ###############################################################################
 
-POPS="pops_in_LocalAncestryFlare.txt"
-TOTAL_POPS=$(wc -l < "$POPS")
-sbatch --array=1-${TOTAL_POPS} anc_runs_in_ibd.sh
+sbatch job_scripts/filter_1kG.sh
