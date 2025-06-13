@@ -29,7 +29,7 @@ module load gcc/13.3.0 bedtools2/2.31.1
 
 # define paths/variables
 LOCAL_ANC="${SCRATCH}/LocalAncestryFLARE_anc_tables"
-IBD_HG38="${SCRATCH}/1000GenomeNYGC_hg38_aydin/hap-ibd_hg38"
+IBD_HG38="${JM1KG}/hap-ibd_hg38"
 LOCAL_ANC_INT_IBD_HG38="${SCRATCH}/LocalAncestryFLARE_int_hap-ibd_hg38"
 POP=$(head -n "${SLURM_ARRAY_TASK_ID}" pops_in_LocalAncestryFlare.txt | tail -n 1 | xargs)
 
@@ -45,12 +45,6 @@ date
 echo "anc_runs_in_ibd: combining ancestral runs for all chromosomes of $POP"
 zcat ${LOCAL_ANC}/${POP}_chr*_anc_runs.bed.gz \
     | bedtools sort -i - | gzip > "$ALLCHROM_ANC"
-
-# combine all chromosome ibd files for this population
-date
-echo "anc_runs_in_ibd: combining indiv. chromosome ibd files of $POP"
-zcat ${IBD_HG38}/${POP}_chr*.ibd.gz \
-    | gzip > "$ALLCHROM_IBD"
 
 # convert and sort ibd file to bed
 date
@@ -76,3 +70,7 @@ bedtools intersect \
                 print;
         }' \
     | gzip > "$ANC_IN_IBD"
+
+# move intermediate files to sub-dir
+mkdir -p "${LOCAL_ANC_INT_IBD_HG38}/int"
+mv "$IBD_BED" "${LOCAL_ANC_INT_IBD_HG38}/int"

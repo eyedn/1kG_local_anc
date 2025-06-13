@@ -12,4 +12,4 @@
 
 POPS="pops_in_LocalAncestryFlare.txt"
 TOTAL_POPS=$(wc -l < "$POPS")
-sbatch --array=1-${TOTAL_POPS} anc_runs_in_ibd.sh
+sbatch --array=1-${TOTAL_POPS} job_scripts/anc_runs_in_ibd.sh
